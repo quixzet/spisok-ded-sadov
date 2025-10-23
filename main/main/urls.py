@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from standoff2 import views  # добавьте этот импорт
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.kindergarten_list, name='kindergarten_list'),
+    path('kindergartens/', views.kindergarten_list, name='kindergarten_list'),
+    path('teachers/', views.teacher_list, name='teacher_list'),
 ]

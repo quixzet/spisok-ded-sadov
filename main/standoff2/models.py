@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 
 class Child(models.Model):
     first_name = models.CharField(max_length=255, verbose_name="Имя")
@@ -32,8 +33,8 @@ class Kindergarten(models.Model):
     name = models.CharField(max_length=255, verbose_name="Название")
     address = models.CharField(max_length=255, verbose_name="Адрес")
     capacity = models.IntegerField(verbose_name="Вместимость (кол-во детей)")
-    established_at = models.DateField(verbose_name="Дата основания")
-    phone = models.CharField(max_length=20, verbose_name="Телефон")
+    established_at = models.DateField(verbose_name="Дата основания", default=date(2020, 1, 1))
+    phone = models.CharField(max_length=20, verbose_name="Телефон", null=True, blank=True)
 
     def str(self):
         return self.name

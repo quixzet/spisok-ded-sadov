@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Все детские сады{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Детские сады</h1>
+    <span class="badge bg-primary">{{ kindergartens|length }} садов</span>
+</div>
+
+<div class="row">
+    {% for kindergarten in kindergartens %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card kindergarten-card">
+            <div class="card-body">
+                <h5 class="card-title">{{ kindergarten.name }}</h5>
+                <p class="card-text">
+                    <strong>📍 Адрес:</strong> {{ kindergarten.address }}<br>
+                    <strong>👥 Вместимость:</strong> {{ kindergarten.capacity }} детей<br>
+                    <strong>📞 Телефон:</strong> {{ kindergarten.phone }}<br>
+                    <strong>📅 Основан:</strong> {{ kindergarten.established_at|date:"Y" }} году
+                </p>
+                
+                <!-- Статистика -->
+                <div class="d-flex justify-content-between small text-muted mb-3">
+                    <span>👩‍🏫 {{ kindergarten.kindergartenteacher_set.count }} воспит.</span>
+                    <span>👶 {{ kindergarten.group_set.count }} групп</span>
+                    <span>⭐ {{ kindergarten.review_set.count }} отзывов</span>
+                </div>
+                
+                <div class="btn-group w-100">
+                    <a href="{% url 'kindergarten_detail' kindergarten.pk %}" class="btn btn-primary btn-sm">
+                        Подробнее
+                    </a>
+                    <a href="{% url 'review_list' %}?kindergarten={{ kindergarten.pk }}" class="btn btn-outline-secondary btn-sm">
+                        Отзывы
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <h4>Детские сады не найдены</h4>
+            <p>Пока не добавлено ни одного детского сада.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
