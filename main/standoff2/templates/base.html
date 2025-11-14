@@ -3,61 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Детские сады{% endblock %}</title>
+    <title>{% block title %}УмноеРазвитие - Детские сады{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .navbar-brand { font-weight: bold; }
-        .card { margin-bottom: 20px; }
-        .rating { color: #ffc107; }
-        .kindergarten-card { transition: transform 0.2s; }
-        .kindergarten-card:hover { transform: translateY(-5px); }
-        html, body {
-        height: 100%;
-    }
-    body {
-        display: flex;
-        flex-direction: column;
-    }
-    .flex-grow-1 {
-        flex: 1 0 auto;
-    }
+        :root {
+            --primary: #4a6bff;
+            --primary-dark: #3a56d4;
+            --secondary: #ff7b4a;
+            --accent: #6c5ce7;
+            --light: #f8f9fa;
+            --dark: #2d3436;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --gradient: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f9fafb;
+            color: var(--dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: var(--gradient);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-link {
+            font-weight: 600;
+            padding: 0.5rem 1rem !important;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            margin: 0 0.2rem;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .main-content {
+            flex: 1 0 auto;
+        }
+        
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .footer h5 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer h5::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: #b2bec3;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: #b2bec3;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(74, 107, 255, 0.4);
+        }
+        
+        .section-title {
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
     <!-- Навигация -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'kindergarten_list' %}">🎓 Детские сады</a>
+            <a class="navbar-brand" href="{% url 'kindergarten_list' %}">
+                <i class="fas fa-school"></i>
+                УмноеРазвитие
+            </a>
             
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link {% if request.resolver_match.url_name == 'kindergarten_list' %}active{% endif %}" 
-                   href="{% url 'kindergarten_list' %}">
-                   Все сады
-                </a>
-                <a class="nav-link {% if request.resolver_match.url_name == 'teacher_list' %}active{% endif %}" 
-                   href="{% url 'teacher_list' %}">
-                   Воспитатели
-                </a>
-                <a class="nav-link {% if request.resolver_match.url_name == 'review_list' %}active{% endif %}" 
-                   href="{% url 'review_list' %}">
-                   Отзывы
-                </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'kindergarten_list' %}active{% endif %}" 
+                           href="{% url 'kindergarten_list' %}">
+                           <i class="fas fa-home me-1"></i>Все сады
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'teacher_list' %}active{% endif %}" 
+                           href="{% url 'teacher_list' %}">
+                           <i class="fas fa-chalkboard-teacher me-1"></i>Воспитатели
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'review_list' %}active{% endif %}" 
+                           href="{% url 'review_list' %}">
+                           <i class="fas fa-star me-1"></i>Отзывы
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Контент -->
-    <main class="flex-grow-1">
-    <div class="container mt-4">
+    <!-- Основной контент -->
+    <main class="main-content">
         {% block content %}
         {% endblock %}
-    </div>
     </main>
 
     <!-- Футер -->
-    <footer class="bg-dark text-white mt-auto py-4">
-        <div class="container text-center">
-            <p>&copy; 2025 Список детских садов. Все права защищены.</p>
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5>УмноеРазвитие</h5>
+                    <p>Мы помогаем родителям найти лучшие детские сады для гармоничного развития детей с профессиональным подходом и заботой.</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-vk"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 mb-4">
+                    <h5>Навигация</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'kindergarten_list' %}">Все сады</a></li>
+                        <li><a href="{% url 'teacher_list' %}">Воспитатели</a></li>
+                        <li><a href="{% url 'review_list' %}">Отзывы</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5>Контакты</h5>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone me-2"></i> +7 (922) 784-77-1</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@smartkids.ru</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> г. Москва, ул. Образцова, 15</li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5>Подписка</h5>
+                    <p>Получайте новости о новых детских садах и акциях</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Ваш email">
+                        <button class="btn btn-primary" type="button">OK</button>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 УмноеРазвитие. Все права защищены.</p>
+            </div>
         </div>
     </footer>
 

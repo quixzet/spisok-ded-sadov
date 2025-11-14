@@ -1,118 +1,162 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ kindergarten.name }}{% endblock %}
+{% block title %}{{ kindergarten.name }} | УмноеРазвитие{% endblock %}
 
 {% block content %}
-<!-- Хлебные крошки -->
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'kindergarten_list' %}">Все сады</a></li>
-        <li class="breadcrumb-item active">{{ kindergarten.name }}</li>
-    </ol>
-</nav>
-
-<div class="row">
-    <div class="col-md-8">
-        <!-- Основная информация -->
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h2 class="mb-0">{{ kindergarten.name }}</h2>
+<!-- Детальный заголовок -->
+<section class="detail-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'kindergarten_list' %}" class="text-white">Все сады</a></li>
+                <li class="breadcrumb-item active text-white">{{ kindergarten.name }}</li>
+            </ol>
+        </nav>
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-5 fw-bold">{{ kindergarten.name }}</h1>
+                <p class="lead mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ kindergarten.address }}</p>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>📍 Адрес:</strong> {{ kindergarten.address }}</p>
-                        <p><strong>👥 Вместимость:</strong> {{ kindergarten.capacity }} детей</p>
-                        <p><strong>📞 Телефон:</strong> {{ kindergarten.phone }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>📅 Основан:</strong> {{ kindergarten.established_at }}</p>
-                        <p><strong>🏢 Групп:</strong> {{ kindergarten.group_set.count }}</p>
-                        <p><strong>👩‍🏫 Воспитателей:</strong> {{ kindergarten.kindergartenteacher_set.count }}</p>
-                    </div>
+            <div class="col-md-4 text-md-end">
+                <div class="rating fs-4">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                    <span class="ms-2">4.5/5</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Группы -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h4 class="mb-0">🏢 Группы</h4>
-            </div>
-            <div class="card-body">
-                {% for group in kindergarten.group_set.all %}
-                <div class="border-bottom pb-3 mb-3">
-                    <h5>{{ group.name }}</h5>
-                    <p class="mb-1"><strong>Возрастная категория:</strong> {{ group.age_range }}</p>
-                    <p class="mb-1"><strong>Детей в группе:</strong> {{ group.enrollment_set.count }}</p>
-                    
-                    <!-- Дети в группе -->
-                    {% if group.enrollment_set.all %}
-                    <div class="mt-2">
-                        <strong>Дети:</strong>
-                        {% for enrollment in group.enrollment_set.all %}
-                        <span class="badge bg-light text-dark">{{ enrollment.child.first_name }} {{ enrollment.child.last_name }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-                {% empty %}
-                <p class="text-muted">Группы не добавлены</p>
-                {% endfor %}
+                <p class="mb-0">{{ kindergarten.review_set.count }} отзывов</p>
             </div>
         </div>
     </div>
+</section>
 
-    <div class="col-md-4">
-        <!-- Воспитатели -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">👩‍🏫 Воспитатели</h5>
-            </div>
-            <div class="card-body">
-                {% for kg_teacher in kindergarten.kindergartenteacher_set.all %}
-                <div class="border-bottom pb-2 mb-2">
-                    <strong>{{ kg_teacher.teacher.first_name }} {{ kg_teacher.teacher.last_name }}</strong>
-                    <p class="mb-1 small text-muted">{{ kg_teacher.teacher.qualification }}</p>
-                    <small class="text-muted">📞 {{ kg_teacher.teacher.phone_number }}</small>
-                </div>
-                {% empty %}
-                <p class="text-muted">Воспитатели не добавлены</p>
-                {% endfor %}
-                
-                <a href="{% url 'teacher_list' %}?kindergarten={{ kindergarten.pk }}" class="btn btn-outline-primary btn-sm mt-2">
-                    Все воспитатели
-                </a>
-            </div>
-        </div>
-
-        <!-- Отзывы -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">⭐ Отзывы</h5>
-            </div>
-            <div class="card-body">
-                {% for review in kindergarten.review_set.all|slice:":3" %}
-                <div class="border-bottom pb-2 mb-2">
-                    <strong>{{ review.parent_name }}</strong>
-                    <div class="rating">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
-                        {% endfor %}
-                        ({{ review.rating }}/5)
+<!-- Основная информация -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- О саде -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>О детском саде</h3>
                     </div>
-                    <p class="mb-1 small">{{ review.comment|truncatewords:15 }}</p>
-                    <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-map-marker-alt text-primary me-2"></i> Адрес:</strong> {{ kindergarten.address }}</p>
+                                <p><strong><i class="fas fa-users text-primary me-2"></i> Вместимость:</strong> {{ kindergarten.capacity }} детей</p>
+                                <p><strong><i class="fas fa-phone text-primary me-2"></i> Телефон:</strong> {{ kindergarten.phone }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-calendar-alt text-primary me-2"></i> Основан:</strong> {{ kindergarten.established_at }}</p>
+                                <p><strong><i class="fas fa-door-open text-primary me-2"></i> Групп:</strong> {{ kindergarten.group_set.count }}</p>
+                                <p><strong><i class="fas fa-chalkboard-teacher text-primary me-2"></i> Воспитателей:</strong> {{ kindergarten.kindergartenteacher_set.count }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% empty %}
-                <p class="text-muted">Отзывов пока нет</p>
-                {% endfor %}
-                
-                <a href="{% url 'review_list' %}?kindergarten={{ kindergarten.pk }}" class="btn btn-outline-primary btn-sm mt-2">
-                    Все отзывы
-                </a>
+
+                <!-- Группы -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-door-open me-2"></i>Группы</h4>
+                    </div>
+                    <div class="card-body">
+                        {% for group in kindergarten.group_set.all %}
+                        <div class="group-item border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="mb-1">{{ group.name }}</h5>
+                                    <p class="mb-1 text-muted"><i class="fas fa-child me-1"></i> {{ group.age_range }}</p>
+                                    <p class="mb-1 text-muted"><i class="fas fa-user-friends me-1"></i> {{ group.enrollment_set.count }} детей в группе</p>
+                                </div>
+                                <span class="badge bg-primary fs-6">{{ group.enrollment_set.count }}/15</span>
+                            </div>
+                            
+                            {% if group.enrollment_set.all %}
+                            <div class="mt-2">
+                                <strong>Дети в группе:</strong>
+                                <div class="mt-1">
+                                    {% for enrollment in group.enrollment_set.all %}
+                                    <span class="badge bg-light text-dark me-1 mb-1">{{ enrollment.child.first_name }} {{ enrollment.child.last_name }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center py-3"><i class="fas fa-door-open me-2"></i>Группы не добавлены</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Воспитатели -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Воспитатели</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for kg_teacher in kindergarten.kindergartenteacher_set.all %}
+                        <div class="teacher-preview border-bottom pb-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="teacher-avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <strong>{{ kg_teacher.teacher.first_name }} {{ kg_teacher.teacher.last_name }}</strong>
+                                    <p class="mb-1 small text-muted">{{ kg_teacher.teacher.qualification }}</p>
+                                    <small class="text-muted"><i class="fas fa-phone me-1"></i>{{ kg_teacher.teacher.phone_number }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center py-3"><i class="fas fa-chalkboard-teacher me-2"></i>Воспитатели не добавлены</p>
+                        {% endfor %}
+                        
+                        <a href="{% url 'teacher_list' %}?kindergarten={{ kindergarten.pk }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-list me-2"></i>Все воспитатели
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Отзывы -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-star me-2"></i>Отзывы</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for review in kindergarten.review_set.all|slice:":3" %}
+                        <div class="review-preview border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <strong>{{ review.parent_name }}</strong>
+                                <div class="rating small">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                        <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                        <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="mb-2 small">{{ review.comment|truncatewords:15 }}</p>
+                            <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center py-3"><i class="fas fa-star me-2"></i>Отзывов пока нет</p>
+                        {% endfor %}
+                        
+                        <a href="{% url 'review_list' %}?kindergarten={{ kindergarten.pk }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-comments me-2"></i>Все отзывы
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

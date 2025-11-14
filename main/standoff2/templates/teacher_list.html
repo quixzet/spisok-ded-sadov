@@ -1,86 +1,167 @@
 {% extends 'base.html' %}
 
-{% block title %}Воспитатели{% endblock %}
+{% block title %}Наши воспитатели | УмноеРазвитие{% endblock %}
 
 {% block content %}
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h2">Список воспитателей</h1>
-
-  </div>
-
-  <!-- Фильтр по детскому саду -->
-  <form method="GET" class="mb-4">
-    <div class="row g-2">
-      <div class="col-md-6">
-        <select name="kindergarten" class="form-select" onchange="this.form.submit()">
-          <option value="">Все детские сады</option>
-          {% for k in kindergartens %}
-            <option value="{{ k.id }}" {% if request.GET.kindergarten|add:"0" == k.id|add:"0" %}selected{% endif %}>
-              {{ k.name }}
-            </option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-outline-secondary w-100">Фильтр</button>
-      </div>
-    </div>
-  </form>
-
-  <!-- Список воспитателей -->
-  {% if teachers %}
-    <div class="row g-3">
-      {% for teacher in teachers %}
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100 shadow-sm border-0">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title mb-1">{{ teacher.first_name }} {{ teacher.last_name }}</h5>
-              <p class="text-muted small mb-2">
-                {% if teacher.kindergarten %}
-                  <strong>Детский сад:</strong> {{ teacher.kindergarten.name }}
-                {% else %}
-                  Без сада
-                {% endif %}
-              </p>
-              <p class="text-muted small mb-2">
-                <strong>Квалификация:</strong> {{ teacher.qualification }}
-              </p>
-              {% if teacher.phone_number %}
-                <p class="text-muted small mb-2">
-                  <strong>Телефон:</strong> <a href="tel:{{ teacher.phone_number }}">{{ teacher.phone_number }}</a>
-                </p>
-              {% endif %}
-              <div class="mt-auto d-flex gap-2">
-              </div>
+<!-- Заголовок страницы -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-5 fw-bold">Наши воспитатели</h1>
+                <p class="lead">Профессиональные педагоги с большим опытом работы и любовью к детям</p>
             </div>
-          </div>
+            <div class="col-md-4 text-center">
+                <div style="font-size: 100px; opacity: 0.7;">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+            </div>
         </div>
-      {% endfor %}
     </div>
-  {% else %}
-    <div class="alert alert-info">
-      {% if request.GET.kindergarten %}
-        Нет воспитателей в выбранном детском саду.
-      {% else %}
-        Пока нет ни одного воспитателя. Добавьте первого!
-      {% endif %}
-    </div>
-  {% endif %}
+</section>
 
-  <!-- Пагинация (если есть) -->
-  {% if is_paginated %}
-    <nav aria-label="Page navigation" class="mt-4">
-      <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page=1">« Первая</a></li>
-          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Предыдущая</a></li>
+<!-- Фильтры -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <form method="GET" class="card p-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Детский сад</label>
+                    <select name="kindergarten" class="form-select" onchange="this.form.submit()">
+                        <option value="">Все детские сады</option>
+                        {% for k in kindergartens %}
+                            <option value="{{ k.id }}" {% if request.GET.kindergarten|add:"0" == k.id|add:"0" %}selected{% endif %}>
+                                {{ k.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Квалификация</label>
+                    <select class="form-select">
+                        <option selected>Любая квалификация</option>
+                        <option>Высшая категория</option>
+                        <option>Первая категория</option>
+                        <option>Молодой специалист</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Применить</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Список воспитателей -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="section-title">Команда профессионалов</h2>
+            <span class="badge bg-primary fs-6 p-2">{{ teachers|length }} воспитателей</span>
+        </div>
+
+        {% if teachers %}
+        <div class="row">
+            {% for teacher in teachers %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card teacher-card h-100 text-center">
+                    <div class="teacher-avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4>{{ teacher.first_name }} {{ teacher.last_name }}</h4>
+                    <p class="text-muted mb-2">{{ teacher.qualification }}</p>
+                    
+                    {% if teacher.kindergarten %}
+                    <p class="mb-2">
+                        <i class="fas fa-school text-primary me-1"></i>
+                        {{ teacher.kindergarten.name }}
+                    </p>
+                    {% else %}
+                    <p class="mb-2 text-muted">
+                        <i class="fas fa-school me-1"></i>
+                        Без сада
+                    </p>
+                    {% endif %}
+                    
+                    {% if teacher.phone_number %}
+                    <p class="mb-3">
+                        <i class="fas fa-phone text-primary me-1"></i>
+                        <a href="tel:{{ teacher.phone_number }}" class="text-decoration-none">{{ teacher.phone_number }}</a>
+                    </p>
+                    {% endif %}
+                    
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-center gap-2">
+                            <span class="badge bg-light text-dark">Опыт 5+ лет</span>
+                            <span class="badge bg-light text-dark">Дети 3-6 лет</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card text-center py-5">
+            <div class="card-body">
+                <i class="fas fa-chalkboard-teacher fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">
+                    {% if request.GET.kindergarten %}
+                        Нет воспитателей в выбранном детском саду
+                    {% else %}
+                        Пока нет ни одного воспитателя
+                    {% endif %}
+                </h4>
+                <p class="text-muted">Добавьте первого воспитателя через административную панель</p>
+            </div>
+        </div>
         {% endif %}
-        <li class="page-item active"><span class="page-link">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span></li>
-        {% if page_obj.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая ›</a></li>
-          <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a></li>
+
+        <!-- Пагинация -->
+        {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span></li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
         {% endif %}
-      </ul>
-    </nav>
-  {% endif %}
+    </div>
+</section>
+
+<!-- Призыв к действию -->
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="section-title">Станьте частью нашей команды</h2>
+        <p class="lead mb-4">Мы всегда рады талантливым педагогам, которые любят детей и свою профессию</p>
+        <button class="btn btn-primary btn-lg px-4">
+            <i class="fas fa-paper-plane me-2"></i>Отправить резюме
+        </button>
+    </div>
+</section>
 {% endblock %}
