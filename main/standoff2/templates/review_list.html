@@ -1,2 +1,397 @@
-<h1>Список отзывов</h1>
-<p>Это работает!</p>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Детские сады — Солнышко</title>
+  <style>
+    /* Общие стили */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f9f9f9;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Шапка сайта */
+    .header {
+      background-color: #1a75ff;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+
+    .header .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .header .nav {
+      display: flex;
+      gap: 20px;
+    }
+
+    .header .nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .header .nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Основной контент */
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      color: #222;
+    }
+
+    /* Карточка детского сада */
+    .kindergarten-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .kindergarten-card h2 {
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+      color: #222;
+    }
+
+    .kindergarten-info {
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+    }
+
+    .kindergarten-info p {
+      margin: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kindergarten-info .icon {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #1a75ff;
+    }
+
+    .kindergarten-stats {
+      display: flex;
+      gap: 20px;
+      margin: 15px 0;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .kindergarten-stats span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .kindergarten-stats .icon {
+      font-size: 0.9rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-align: center;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+      background-color: #1a75ff;
+      color: white;
+      border-color: #1a75ff;
+    }
+
+    .btn-primary:hover {
+      background-color: #155bb5;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: #333;
+    }
+
+    .btn-outline:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Раздел отзывов */
+    .reviews-section {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .reviews-section h2 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: #222;
+    }
+
+    .review-item {
+      background: white;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .review-author {
+      font-weight: bold;
+      color: #222;
+    }
+
+    .review-date {
+      color: #888;
+    }
+
+    .review-rating {
+      color: #ffc107;
+      font-weight: bold;
+    }
+
+    .review-text {
+      margin-top: 10px;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    /* Форма добавления отзыва */
+    .add-review-form {
+      margin-top: 30px;
+      padding: 20px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    .add-review-form h3 {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #1a75ff;
+      box-shadow: 0 0 0 2px rgba(26, 117, 255, 0.1);
+    }
+
+    .btn-submit {
+      background-color: #1a75ff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background-color 0.2s;
+    }
+
+    .btn-submit:hover {
+      background-color: #155bb5;
+    }
+
+    /* Подвал */
+    .footer {
+      background-color: #222;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      font-size: 0.9rem;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Шапка сайта -->
+  <header class="header">
+    <div class="logo">
+      <span>🎓</span>
+      <span>Детские сады</span>
+    </div>
+    <nav class="nav">
+      <a href="#">Все сады</a>
+      <a href="#">Воспитатели</a>
+      <a href="#">Отзывы</a>
+    </nav>
+  </header>
+
+  <!-- Основной контент -->
+  <main class="container">
+
+    <h1>Детские сады</h1>
+
+    <!-- Карточка детского сада -->
+    <div class="kindergarten-card">
+      <h2>Солнышко</h2>
+
+      <div class="kindergarten-info">
+        <p><span class="icon">📍</span> <strong>Адрес:</strong> Пушкина 15</p>
+        <p><span class="icon">👥</span> <strong>Вместимость:</strong> 30 детей</p>
+        <p><span class="icon">📞</span> <strong>Телефон:</strong> 7922784771</p>
+        <p><span class="icon">📅</span> <strong>Основан:</strong> 1000 году</p>
+      </div>
+
+      <div class="kindergarten-stats">
+        <span><span class="icon">👩‍🏫</span> 0 воспит.</span>
+        <span><span class="icon">👶</span> 1 групп</span>
+        <span><span class="icon">⭐</span> 0 отзывов</span>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary">Подробнее</button>
+        <button class="btn btn-outline">Отзывы</button>
+      </div>
+    </div>
+
+    <!-- Раздел отзывов -->
+    <section class="reviews-section">
+      <h2>Отзывы</h2>
+
+      <!-- Пример отзыва -->
+      <div class="review-item">
+        <div class="review-header">
+          <span class="review-author">Анна К.</span>
+          <span class="review-date">23 октября 2025 г.</span>
+          <span class="review-rating">★★★★★</span>
+        </div>
+        <div class="review-text">
+          Замечательный сад! Воспитатели — настоящие профессионалы. Дочь ходит с удовольствием, 
+          особенно любит творческие занятия и прогулки в саду. Питание сбалансированное, 
+          ежедневное меню публикуют в родительском чате.
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-header">
+          <span class="review-author">Дмитрий П.</span>
+          <span class="review-date">15 сентября 2025 г.</span>
+          <span class="review-rating">★★★★☆</span>
+        </div>
+        <div class="review-text">
+          В целом довольны. Сад чистый, безопасная территория, видеонаблюдение. 
+          Единственный минус — иногда задерживают выдачу анализов для медкомиссии. 
+          Но руководство всегда идёт навстречу.
+        </div>
+      </div>
+
+      <div class="review-item">
+        <div class="review-header">
+          <span class="review-author">Ольга М.</span>
+          <span class="review-date">7 августа 2025 г.</span>
+          <span class="review-rating">★★★★★</span>
+        </div>
+        <div class="review-text">
+          Благодарим воспитателя Ирину Петровну! За год сын стал увереннее, научился читать, 
+          дружит со сверстниками. Очень ценим индивидуальный подход и регулярные фотоотчёты 
+          в родительский чат. Рекомендуем!
+        </div>
+      </div>
+
+      <!-- Форма добавления отзыва -->
+      <div class="add-review-form">
+        <h3>Оставить отзыв</h3>
+        <form>
+          <div class="form-group">
+            <label for="author">Ваше имя (видно только инициалы)</label>
+            <input type="text" id="author" class="form-control" placeholder="Например, Иван И.">
+          </div>
+          <div class="form-group">
+            <label for="rating">Рейтинг</label>
+            <select id="rating" class="form-control">
+              <option value="5">★★★★★ (Отлично)</option>
+              <option value="4">★★★★☆ (Хорошо)</option>
+              <option value="3">★★★☆☆ (Удовлетворительно)</option>
+              <option value="2">★★☆☆☆ (Плохо)</option>
+              <option value="1">★☆☆☆☆ (Ужасно)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="review">Ваш отзыв</label>
+            <textarea id="review" class="form-control" rows="4" placeholder="Расскажите о своём опыте..."></textarea>
+          </div>
+          <button type="submit" class="btn-submit">Опубликовать отзыв</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Подвал -->
+  <footer class="footer">
+    © 2025 Список детских садов. Все права защищены.
+  </footer>
+
+</body>
+</html>

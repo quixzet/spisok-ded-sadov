@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Kindergarten, Teacher, Review
 
+
 def kindergarten_list(request):
     kindergartens = Kindergarten.objects.all().prefetch_related(
         'group_set', 
@@ -31,7 +32,7 @@ def teacher_list(request):
     kindergarten_id = request.GET.get('kindergarten')
     
     if kindergarten_id:
-        teachers = teachers.filter(kindergartenteacher_set__kindergarten_id=kindergarten_id)
+         teachers = Teacher.objects.none()
     
     return render(request, 'teacher_list.html', {
         'teachers': teachers,

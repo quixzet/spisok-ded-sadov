@@ -3,12 +3,84 @@
 {% block title %}Воспитатели{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Список воспитателей</h1>
-    <p>Здесь будет список воспитателей. Страница в разработке.</p>
-    
-    <div class="alert alert-info">
-        <strong>Внимание:</strong> Эта страница находится в разработке.
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Список воспитателей</h1>
+
+  </div>
+
+  <!-- Фильтр по детскому саду -->
+  <form method="GET" class="mb-4">
+    <div class="row g-2">
+      <div class="col-md-6">
+        <select name="kindergarten" class="form-select" onchange="this.form.submit()">
+          <option value="">Все детские сады</option>
+          {% for k in kindergartens %}
+            <option value="{{ k.id }}" {% if request.GET.kindergarten|add:"0" == k.id|add:"0" %}selected{% endif %}>
+              {{ k.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-secondary w-100">Фильтр</button>
+      </div>
     </div>
-</div>
+  </form>
+
+  <!-- Список воспитателей -->
+  {% if teachers %}
+    <div class="row g-3">
+      {% for teacher in teachers %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title mb-1">{{ teacher.first_name }} {{ teacher.last_name }}</h5>
+              <p class="text-muted small mb-2">
+                {% if teacher.kindergarten %}
+                  <strong>Детский сад:</strong> {{ teacher.kindergarten.name }}
+                {% else %}
+                  Без сада
+                {% endif %}
+              </p>
+              <p class="text-muted small mb-2">
+                <strong>Квалификация:</strong> {{ teacher.qualification }}
+              </p>
+              {% if teacher.phone_number %}
+                <p class="text-muted small mb-2">
+                  <strong>Телефон:</strong> <a href="tel:{{ teacher.phone_number }}">{{ teacher.phone_number }}</a>
+                </p>
+              {% endif %}
+              <div class="mt-auto d-flex gap-2">
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      {% if request.GET.kindergarten %}
+        Нет воспитателей в выбранном детском саду.
+      {% else %}
+        Пока нет ни одного воспитателя. Добавьте первого!
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- Пагинация (если есть) -->
+  {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page=1">« Первая</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Предыдущая</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая ›</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
 {% endblock %}
