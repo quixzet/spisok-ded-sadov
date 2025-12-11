@@ -3,7 +3,7 @@
 {% block title %}Отзывы о детских садах | УмноеРазвитие{% endblock %}
 
 {% block content %}
-<section class="py-5 bg-warning text-dark">
+<section class="py-5" style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #333;">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-8">
@@ -11,7 +11,7 @@
                 <p class="lead">Реальные мнения и опыт родителей о детских садах нашего города</p>
             </div>
             <div class="col-md-4 text-center">
-                <div style="font-size: 100px; opacity: 0.7;">
+                <div style="font-size: 100px; opacity: 0.7; color: rgba(255,255,255,0.5);">
                     <i class="fas fa-star"></i>
                 </div>
             </div>
@@ -23,46 +23,44 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8">
-                <form method="GET" class="card p-3">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-6">
+                <div class="card p-4">
+                    <h3 class="mb-4">Фильтр отзывов</h3>
+                    <form method="GET" class="row g-3 align-items-end">
+                        <div class="col-md-8">
                             <label class="form-label fw-bold">Детский сад</label>
                             <select name="kindergarten" class="form-select" onchange="this.form.submit()">
                                 <option value="">Все детские сады</option>
                                 {% for k in kindergartens %}
-                                    <option value="{{ k.id }}" {% if request.GET.kindergarten|add:"0" == k.id|add:"0" %}selected{% endif %}>
+                                    <option value="{{ k.id }}" {% if request.GET.kindergarten == k.id|stringformat:"i" %}selected{% endif %}>
                                         {{ k.name }}
                                     </option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Рейтинг</label>
-                            <select class="form-select">
-                                <option selected>Любой рейтинг</option>
-                                <option>5 звезд</option>
-                                <option>4 звезды и выше</option>
-                                <option>3 звезды и выше</option>
-                            </select>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter me-2"></i>Применить
+                            </button>
                         </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">Найти</button>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
             <div class="col-md-4">
-                <div class="card text-center p-3 h-100">
-                    <h4 class="text-primary">4.7/5</h4>
-                    <p class="mb-1">Средняя оценка</p>
-                    <div class="rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+                <div class="card text-center p-4 h-100" style="background: linear-gradient(135deg, #4a6bff, #6c5ce7); color: white;">
+                    <h2 class="display-4 fw-bold">{{ avg_rating|floatformat:1 }}</h2>
+                    <div class="rating fs-3 mb-2">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= avg_rating|floatformat:0|add:"0" %}
+                            <i class="fas fa-star"></i>
+                            {% elif forloop.counter|add:"-0.5" <= avg_rating %}
+                            <i class="fas fa-star-half-alt"></i>
+                            {% else %}
+                            <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
                     </div>
-                    <p class="mt-2 small text-muted">На основе {{ reviews|length }} отзывов</p>
+                    <p class="mb-1">Средняя оценка</p>
+                    <p class="small opacity-75">На основе {{ reviews_count }} отзывов</p>
                 </div>
             </div>
         </div>
@@ -86,9 +84,10 @@
                     <div class="review-header">
                         <div>
                             <span class="review-author">{{ review.parent_name }}</span>
-                            {% if review.kindergarten %}
-                            <span class="text-muted">о детском саде <strong>{{ review.kindergarten.name }}</strong></span>
-                            {% endif %}
+                            <span class="text-muted">о детском саде </span>
+                            <a href="{% url 'kindergarten_detail' review.kindergarten.id %}" class="text-decoration-none">
+                                <strong>{{ review.kindergarten.name }}</strong>
+                            </a>
                         </div>
                         <div class="rating">
                             {% for i in "12345" %}
@@ -98,13 +97,18 @@
                                 <i class="far fa-star text-warning"></i>
                                 {% endif %}
                             {% endfor %}
+                            <span class="ms-2 text-muted">{{ review.created_at|date:"d.m.Y" }}</span>
                         </div>
                     </div>
                     <div class="review-text">
                         <p>{{ review.comment }}</p>
                     </div>
                     <div class="review-footer d-flex justify-content-between align-items-center">
-                        <span class="review-date text-muted"><i class="far fa-clock me-1"></i>{{ review.created_at|date:"d.m.Y" }}</span>
+                        <div>
+                            {% if review.parent_email %}
+                            <small class="text-muted"><i class="fas fa-envelope me-1"></i>{{ review.parent_email }}</small>
+                            {% endif %}
+                        </div>
                         <div>
                             <button class="btn btn-sm btn-outline-primary me-1">
                                 <i class="fas fa-thumbs-up me-1"></i>Полезно
@@ -124,9 +128,9 @@
                 <i class="fas fa-star fa-3x text-muted mb-3"></i>
                 <h4 class="text-muted">
                     {% if request.GET.kindergarten %}
-                        Нет отзывов о выбранном детском саду
+                    Нет отзывов о выбранном детском саде
                     {% else %}
-                        Пока нет ни одного отзыва
+                    Пока нет ни одного отзыва
                     {% endif %}
                 </h4>
                 <p class="text-muted">Будьте первым, кто оставит отзыв о детском саде</p>
@@ -142,27 +146,35 @@
             <ul class="pagination justify-content-center">
                 {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1" aria-label="First">
+                    <a class="page-link" href="?page=1{% if request.GET.kindergarten %}&kindergarten={{ request.GET.kindergarten }}{% endif %}" aria-label="First">
                         <span aria-hidden="true">&laquo;&laquo;</span>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.kindergarten %}&kindergarten={{ request.GET.kindergarten }}{% endif %}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
                 {% endif %}
                 
-                <li class="page-item active"><span class="page-link">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span></li>
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.kindergarten %}&kindergarten={{ request.GET.kindergarten }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
                 
                 {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.kindergarten %}&kindergarten={{ request.GET.kindergarten }}{% endif %}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.kindergarten %}&kindergarten={{ request.GET.kindergarten }}{% endif %}" aria-label="Last">
                         <span aria-hidden="true">&raquo;&raquo;</span>
                     </a>
                 </li>
@@ -173,61 +185,102 @@
     </div>
 </section>
 
-<div class="modal fade" id="addReviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- Модальное окно для добавления отзыва -->
+<div class="modal fade" id="addReviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Добавить отзыв</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Ваше имя</label>
-                        <input type="text" class="form-control" placeholder="Как к вам обращаться?">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Детский сад</label>
-                        <select class="form-select">
-                            <option selected>Выберите детский сад</option>
-                            {% for kindergarten in kindergartens %}
-                            <option value="{{ kindergarten.id }}">{{ kindergarten.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Оценка</label>
-                        <div class="rating fs-4">
-                            <i class="far fa-star" data-rating="1"></i>
-                            <i class="far fa-star" data-rating="2"></i>
-                            <i class="far fa-star" data-rating="3"></i>
-                            <i class="far fa-star" data-rating="4"></i>
-                            <i class="far fa-star" data-rating="5"></i>
+            <form method="POST" action="{% url 'review_list' %}">
+                {% csrf_token %}
+                <input type="hidden" name="add_review" value="1">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ваше имя *</label>
+                            <input type="text" class="form-control" name="parent_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Детский сад *</label>
+                            <select name="kindergarten" class="form-select" required>
+                                <option value="">Выберите детский сад</option>
+                                {% for kindergarten in kindergartens %}
+                                <option value="{{ kindergarten.id }}">{{ kindergarten.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
+                    
                     <div class="mb-3">
-                        <label class="form-label">Ваш отзыв</label>
-                        <textarea class="form-control" rows="4" placeholder="Поделитесь вашим опытом..."></textarea>
+                        <label class="form-label">Оценка *</label>
+                        <div class="rating fs-4" id="modalRating">
+                            <!-- Изначально все звёзды пустые -->
+                            <i class="far fa-star text-warning" data-rating="1"></i>
+                            <i class="far fa-star text-warning" data-rating="2"></i>
+                            <i class="far fa-star text-warning" data-rating="3"></i>
+                            <i class="far fa-star text-warning" data-rating="4"></i>
+                            <i class="far fa-star text-warning" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" name="rating" id="modalRatingValue" value="0" required>
+                        <div class="text-danger small mt-1" id="rating-error" style="display: none;">
+                            Пожалуйста, выберите оценку
+                        </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary">Опубликовать отзыв</button>
-            </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Ваш отзыв *</label>
+                        <textarea class="form-control" rows="4" name="comment" placeholder="Поделитесь вашим опытом..." required></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email (не обязательно)</label>
+                            <input type="email" class="form-control" name="parent_email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Телефон (не обязательно)</label>
+                            <input type="tel" class="form-control" name="parent_phone">
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small><i class="fas fa-info-circle me-1"></i>Все отзывы проходят модерацию перед публикацией.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary" id="submit-review-btn">Опубликовать отзыв</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
-
 document.addEventListener('DOMContentLoaded', function() {
-    const stars = document.querySelectorAll('.rating .fa-star');
-    stars.forEach(star => {
+    // Обработка звезд рейтинга в модальном окне
+    const modalStars = document.querySelectorAll('#modalRating .fa-star');
+    const modalRatingValue = document.getElementById('modalRatingValue');
+    const ratingError = document.getElementById('rating-error');
+    const submitBtn = document.getElementById('submit-review-btn');
+    
+    // Инициализация всех звезд как пустых
+    modalStars.forEach(star => {
+        star.classList.remove('fas');
+        star.classList.add('far');
+    });
+    
+    modalStars.forEach(star => {
         star.addEventListener('click', function() {
-            const rating = this.getAttribute('data-rating');
-            stars.forEach((s, index) => {
-                if (index < rating) {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            modalRatingValue.value = rating;
+            ratingError.style.display = 'none';
+            
+            modalStars.forEach((s, index) => {
+                const starRating = parseInt(s.getAttribute('data-rating'));
+                if (starRating <= rating) {
                     s.classList.remove('far');
                     s.classList.add('fas', 'text-warning');
                 } else {
@@ -236,6 +289,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+    });
+    
+    // Валидация формы
+    const form = document.querySelector('#addReviewModal form');
+    form.addEventListener('submit', function(event) {
+        if (modalRatingValue.value === '0' || modalRatingValue.value === '') {
+            event.preventDefault();
+            ratingError.style.display = 'block';
+            modalRatingValue.focus();
+        }
+    });
+    
+    // Сброс рейтинга при закрытии модального окна
+    document.getElementById('addReviewModal').addEventListener('hidden.bs.modal', function() {
+        modalRatingValue.value = '0';
+        modalStars.forEach(star => {
+            star.classList.remove('fas');
+            star.classList.add('far');
+        });
+        ratingError.style.display = 'none';
     });
 });
 </script>

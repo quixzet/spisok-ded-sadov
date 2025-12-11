@@ -21,7 +21,8 @@ from app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.kindergarten_list, name='kindergarten_list'),
-    path('kindergartens/<int:pk>', views.kindergarten_detail, name='kindergarten_detail'),
+    path('kindergartens/<int:pk>/', views.kindergarten_detail, name='kindergarten_detail'),
+    path('kindergarten/<int:kindergarten_id>/add-review/', views.add_review, name='add_review'),
     path('teachers/', views.teacher_list, name='teacher_list'),
     path('reviews/', views.review_list, name='review_list'),
 ]

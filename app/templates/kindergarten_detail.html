@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ kindergarten.name }} | УмноеРазвитие{% endblock %}
 
 {% block content %}
 <!-- Детальный заголовок -->
-<section class="detail-hero">
+<section class="detail-hero" style="background: linear-gradient(135deg, #4a6bff, #6c5ce7); color: white;">
     <div class="container">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -14,19 +15,33 @@
         </nav>
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1 class="display-5 fw-bold">{{ kindergarten.name }}</h1>
+                <h1 class="display-5 fw-bold mb-2">{{ kindergarten.name }}</h1>
+                <div class="rating mb-3">
+                    {% for i in "12345" %}
+                        {% with counter=forloop.counter %}
+                        {% if counter <= avg_rating|floatformat:"0"|add:0 %}
+                        <i class="fas fa-star"></i>
+                        {% elif avg_rating|floatformat:"1" >= counter|add:-0.5|stringformat:"f" %}
+                        <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                    <span class="ms-2 fs-5">{{ avg_rating|floatformat:1 }}</span>
+                    <span class="ms-1">({{ reviews_count }} отзывов)</span>
+                </div>
                 <p class="lead mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ kindergarten.address }}</p>
             </div>
             <div class="col-md-4 text-md-end">
-                <div class="rating fs-4">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                    <span class="ms-2">4.5/5</span>
-                </div>
-                <p class="mb-0">{{ kindergarten.review_set.count }} отзывов</p>
+                {% if kindergarten.is_recommended %}
+                <span class="badge bg-warning text-dark fs-6 p-2 mb-2">
+                    <i class="fas fa-star me-1"></i>Рекомендуемый сад
+                </span>
+                {% endif %}
+                <button class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#bookModal">
+                    <i class="fas fa-calendar-plus me-2"></i>Записаться
+                </button>
             </div>
         </div>
     </div>
@@ -35,32 +50,93 @@
 <!-- Основная информация -->
 <section class="py-5">
     <div class="container">
+        <!-- Сообщения -->
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
         <div class="row">
             <div class="col-lg-8">
                 <!-- О саде -->
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header bg-white">
                         <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>О детском саде</h3>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong><i class="fas fa-map-marker-alt text-primary me-2"></i> Адрес:</strong> {{ kindergarten.address }}</p>
-                                <p><strong><i class="fas fa-users text-primary me-2"></i> Вместимость:</strong> {{ kindergarten.capacity }} детей</p>
-                                <p><strong><i class="fas fa-phone text-primary me-2"></i> Телефон:</strong> {{ kindergarten.phone }}</p>
+                        {% if kindergarten.description %}
+                        <p class="lead mb-4">{{ kindergarten.description }}</p>
+                        {% else %}
+                        <p class="lead mb-4">Современный детский сад с профессиональными воспитателями и развивающей средой.</p>
+                        {% endif %}
+                        
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <h5>Адрес</h5>
+                                <p class="mb-0">{{ kindergarten.address }}</p>
                             </div>
-                            <div class="col-md-6">
-                                <p><strong><i class="fas fa-calendar-alt text-primary me-2"></i> Основан:</strong> {{ kindergarten.established_at }}</p>
-                                <p><strong><i class="fas fa-door-open text-primary me-2"></i> Групп:</strong> {{ kindergarten.group_set.count }}</p>
-                                <p><strong><i class="fas fa-chalkboard-teacher text-primary me-2"></i> Воспитателей:</strong> {{ kindergarten.kindergartenteacher_set.count }}</p>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <h5>Телефон</h5>
+                                <p class="mb-0">{{ kindergarten.phone|default:"Не указан" }}</p>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h5>Вместимость</h5>
+                                <p class="mb-0">{{ kindergarten.capacity }} детей</p>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <h5>Основан</h5>
+                                <p class="mb-0">{{ kindergarten.established_at|date:"Y" }} году</p>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-door-open"></i>
+                                </div>
+                                <h5>Групп</h5>
+                                <p class="mb-0">{{ kindergarten.group_set.count }}</p>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <h5>Воспитателей</h5>
+                                <p class="mb-0">{{ kindergarten.kindergartenteacher_set.count }}</p>
                             </div>
                         </div>
+                        
+                        {% if kindergarten.features %}
+                        <h5 class="mt-4 mb-3"><i class="fas fa-check-circle text-success me-2"></i>Особенности сада:</h5>
+                        <div class="row">
+                            {% for feature in kindergarten.features_list %}
+                            <div class="col-md-6">
+                                <p class="mb-2"><i class="fas fa-check text-success me-2"></i>{{ feature }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <!-- Группы -->
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header bg-white">
                         <h4 class="mb-0"><i class="fas fa-door-open me-2"></i>Группы</h4>
                     </div>
                     <div class="card-body">
@@ -71,8 +147,18 @@
                                     <h5 class="mb-1">{{ group.name }}</h5>
                                     <p class="mb-1 text-muted"><i class="fas fa-child me-1"></i> {{ group.age_range }}</p>
                                     <p class="mb-1 text-muted"><i class="fas fa-user-friends me-1"></i> {{ group.enrollment_set.count }} детей в группе</p>
+                                    {% if group.description %}
+                                    <p class="mb-2">{{ group.description }}</p>
+                                    {% endif %}
                                 </div>
-                                <span class="badge bg-primary fs-6">{{ group.enrollment_set.count }}/15</span>
+                                <div class="text-end">
+                                    <span class="badge bg-primary fs-6">{{ group.enrollment_set.count }}/{{ group.max_capacity|default:15 }}</span>
+                                    {% if group.enrollment_set.count < group.max_capacity %}
+                                    <p class="text-success small mb-0 mt-1">Есть свободные места</p>
+                                    {% else %}
+                                    <p class="text-danger small mb-0 mt-1">Группа заполнена</p>
+                                    {% endif %}
+                                </div>
                             </div>
                             
                             {% if group.enrollment_set.all %}
@@ -80,8 +166,13 @@
                                 <strong>Дети в группе:</strong>
                                 <div class="mt-1">
                                     {% for enrollment in group.enrollment_set.all %}
-                                    <span class="badge bg-light text-dark me-1 mb-1">{{ enrollment.child.first_name }} {{ enrollment.child.last_name }}</span>
+                                        {% if forloop.counter <= 8 %}
+                                        <span class="badge bg-light text-dark me-1 mb-1">{{ enrollment.child.first_name }}</span>
+                                        {% endif %}
                                     {% endfor %}
+                                    {% if group.enrollment_set.count > 8 %}
+                                    <span class="badge bg-light text-dark">+{{ group.enrollment_set.count|add:-8 }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                             {% endif %}
@@ -96,67 +187,231 @@
             <div class="col-lg-4">
                 <!-- Воспитатели -->
                 <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Воспитатели</h5>
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Наши воспитатели</h5>
                     </div>
                     <div class="card-body">
                         {% for kg_teacher in kindergarten.kindergartenteacher_set.all %}
-                        <div class="teacher-preview border-bottom pb-3 mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="teacher-avatar-placeholder bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div>
-                                    <strong>{{ kg_teacher.teacher.first_name }} {{ kg_teacher.teacher.last_name }}</strong>
-                                    <p class="mb-1 small text-muted">{{ kg_teacher.teacher.qualification }}</p>
-                                    <small class="text-muted"><i class="fas fa-phone me-1"></i>{{ kg_teacher.teacher.phone_number }}</small>
+                            {% if forloop.counter <= 4 %}
+                            <div class="teacher-preview border-bottom pb-3 mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="teacher-avatar-placeholder me-3 flex-shrink-0" style="width: 60px; height: 60px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <strong>{{ kg_teacher.teacher.first_name }} {{ kg_teacher.teacher.last_name }}</strong>
+                                        <p class="mb-1 small text-muted">{{ kg_teacher.teacher.qualification }}</p>
+                                        <p class="mb-1 small">
+                                            <i class="fas fa-star text-warning me-1"></i>
+                                            {{ kg_teacher.teacher.experience_years }} лет опыта
+                                        </p>
+                                        {% if kg_teacher.role != 'воспитатель' %}
+                                        <p class="mb-1 small">
+                                            <i class="fas fa-briefcase text-primary me-1"></i>
+                                            {{ kg_teacher.get_role_display }}
+                                        </p>
+                                        {% endif %}
+                                        {% if kg_teacher.teacher.phone_number %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-phone me-1"></i>
+                                            {{ kg_teacher.teacher.phone_number }}
+                                        </small>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            {% endif %}
                         {% empty %}
                         <p class="text-muted text-center py-3"><i class="fas fa-chalkboard-teacher me-2"></i>Воспитатели не добавлены</p>
                         {% endfor %}
                         
+                        {% if kindergarten.kindergartenteacher_set.count > 4 %}
                         <a href="{% url 'teacher_list' %}?kindergarten={{ kindergarten.pk }}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-list me-2"></i>Все воспитатели
+                            <i class="fas fa-list me-2"></i>Все воспитатели ({{ kindergarten.kindergartenteacher_set.count }})
                         </a>
+                        {% endif %}
                     </div>
                 </div>
 
                 <!-- Отзывы -->
                 <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-star me-2"></i>Отзывы</h5>
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-star me-2"></i>Отзывы родителей</h5>
                     </div>
                     <div class="card-body">
-                        {% for review in kindergarten.review_set.all|slice:":3" %}
-                        <div class="review-preview border-bottom pb-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <strong>{{ review.parent_name }}</strong>
-                                <div class="rating small">
-                                    {% for i in "12345" %}
-                                        {% if forloop.counter <= review.rating %}
-                                        <i class="fas fa-star text-warning"></i>
-                                        {% else %}
-                                        <i class="far fa-star text-warning"></i>
-                                        {% endif %}
-                                    {% endfor %}
+                        {% for review in kindergarten.review_set.all %}
+                            {% if forloop.counter <= 2 %}
+                            <div class="review-preview border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong>{{ review.parent_name }}</strong>
+                                    <div class="rating small">
+                                        {% for i in "12345" %}
+                                            {% with counter=forloop.counter %}
+                                            {% if counter <= review.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                            {% endif %}
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </div>
                                 </div>
+                                <p class="mb-2 small">
+                                    {% if review.comment|length > 50 %}
+                                    {{ review.comment|slice:":50" }}...
+                                    {% else %}
+                                    {{ review.comment }}
+                                    {% endif %}
+                                </p>
+                                <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
                             </div>
-                            <p class="mb-2 small">{{ review.comment|truncatewords:15 }}</p>
-                            <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
-                        </div>
+                            {% endif %}
                         {% empty %}
                         <p class="text-muted text-center py-3"><i class="fas fa-star me-2"></i>Отзывов пока нет</p>
                         {% endfor %}
                         
-                        <a href="{% url 'review_list' %}?kindergarten={{ kindergarten.pk }}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-comments me-2"></i>Все отзывы
-                        </a>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'review_list' %}?kindergarten={{ kindergarten.pk }}" class="btn btn-outline-primary">
+                                <i class="fas fa-comments me-2"></i>Все отзывы
+                            </a>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+                                <i class="fas fa-edit me-2"></i>Оставить отзыв
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Модальное окно для записи -->
+<div class="modal fade" id="bookModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Запись в детский сад "{{ kindergarten.name }}"</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="#">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Имя ребенка *</label>
+                        <input type="text" class="form-control" name="child_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Возраст ребенка *</label>
+                        <input type="number" class="form-control" name="child_age" min="1" max="7" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Имя родителя *</label>
+                        <input type="text" class="form-control" name="parent_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Телефон *</label>
+                        <input type="tel" class="form-control" name="phone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Сообщение</label>
+                        <textarea class="form-control" rows="3" name="message" placeholder="Дополнительная информация..."></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <small><i class="fas fa-info-circle me-1"></i>Мы свяжемся с вами в течение 24 часов для подтверждения записи.</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary">Отправить заявку</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для отзыва -->
+<div class="modal fade" id="addReviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Оставить отзыв о "{{ kindergarten.name }}"</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'kindergarten_detail' kindergarten.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="add_review" value="1">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Ваше имя *</label>
+                        <input type="text" class="form-control" name="parent_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Оценка *</label>
+                        <div class="rating fs-4" id="reviewRating">
+                            <i class="fas fa-star text-warning" data-rating="1"></i>
+                            <i class="fas fa-star text-warning" data-rating="2"></i>
+                            <i class="fas fa-star text-warning" data-rating="3"></i>
+                            <i class="fas fa-star text-warning" data-rating="4"></i>
+                            <i class="fas fa-star text-warning" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" name="rating" id="ratingValue" value="5" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ваш отзыв *</label>
+                        <textarea class="form-control" rows="4" name="comment" placeholder="Расскажите о вашем опыте..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email (не обязательно)</label>
+                        <input type="email" class="form-control" name="parent_email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Телефон (не обязательно)</label>
+                        <input type="tel" class="form-control" name="parent_phone">
+                    </div>
+                    <input type="hidden" name="kindergarten" value="{{ kindergarten.id }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+// Обработка звезд рейтинга в модальном окне
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('#reviewRating .fa-star');
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.getAttribute('data-rating');
+            document.getElementById('ratingValue').value = rating;
+            
+            stars.forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.remove('far');
+                    s.classList.add('fas', 'text-warning');
+                } else {
+                    s.classList.remove('fas', 'text-warning');
+                    s.classList.add('far');
+                }
+            });
+        });
+    });
+    
+    // Инициализация всех звезд как заполненных (рейтинг 5 по умолчанию)
+    stars.forEach((star, index) => {
+        if (index < 5) {
+            star.classList.add('fas', 'text-warning');
+        }
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

@@ -19,39 +19,6 @@
     </div>
 </section>
 
-<!-- Фильтры -->
-<section class="py-4 bg-light">
-    <div class="container">
-        <form method="GET" class="card p-4">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">Детский сад</label>
-                    <select name="kindergarten" class="form-select" onchange="this.form.submit()">
-                        <option value="">Все детские сады</option>
-                        {% for k in kindergartens %}
-                            <option value="{{ k.id }}" {% if request.GET.kindergarten|add:"0" == k.id|add:"0" %}selected{% endif %}>
-                                {{ k.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">Квалификация</label>
-                    <select class="form-select">
-                        <option selected>Любая квалификация</option>
-                        <option>Высшая категория</option>
-                        <option>Первая категория</option>
-                        <option>Молодой специалист</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Применить</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</section>
-
 <section class="py-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-5">
@@ -104,11 +71,7 @@
             <div class="card-body">
                 <i class="fas fa-chalkboard-teacher fa-3x text-muted mb-3"></i>
                 <h4 class="text-muted">
-                    {% if request.GET.kindergarten %}
-                        Нет воспитателей в выбранном детском саду
-                    {% else %}
-                        Пока нет ни одного воспитателя
-                    {% endif %}
+                    Пока нет ни одного воспитателя
                 </h4>
                 <p class="text-muted">Добавьте первого воспитателя через административную панель</p>
             </div>
